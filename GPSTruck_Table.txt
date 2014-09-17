@@ -1,0 +1,12 @@
+GPSTruck
+----------
+ID	int(11)	// Primary Key AI UN
+TruckName	varchar(45)	YES // The Display Name of the Truck			
+TruckID	varchar(45)	YES // The ID of the Cell Phone User (UserNum) or MEID of Truck GPS Box
+TruckSerial	varchar(45)	YES // The Serial # of Truck GPS Box	
+TruckPart	varchar(45)	YES // The Part # of Truck GPS Box
+TruckDriver	int(11)	YES // The UserNum of the User driving a truck (non phone, truck gps box)			
+CustomerId	varchar(45)	YES // The company that owns this entry for phone/truck			
+ServiceTech	int(11)	YES		0 // Checks to see if the user is Service Tech (1) or Normal Driver (0)
+Tracking	int(11)	NO		1 // Checks to see if entry is being tracked in GPS (1) or Disabled (0)	
+Truck	varchar(45)	YES		no // Checks to see if user is on Phone (no) or actual Truck GPS (yes)	
