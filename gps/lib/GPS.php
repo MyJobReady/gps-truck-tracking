@@ -137,6 +137,21 @@
 			return pdo_execute_query($sql, $params);
     	}
 
+    	public static function GetData($GPSID, $StartDate, $FinishDate)
+    	{
+    		$sql = "SELECT
+			    *
+			FROM
+			    GPSData
+			WHERE
+			    GPSID = :id
+			        AND TimeStamp BETWEEN '$StartDate 00:00:00' AND '$FinishDate 23:59:59'
+			GROUP BY TimeStamp
+			LIMIT 1440";
+    		$params = array(':id' => $GPSID,);
+    		return pdo_execute_query($sql, $params);
+    	}
+
     	public static function VGCD($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000)
     	{
     		// Great-Circle Distance convert from degrees to radians

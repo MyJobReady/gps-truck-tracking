@@ -3,6 +3,7 @@ require("inc_header_ps.php");
 	require_once('../lib/GPS.php');
 	mysql_select_db($db_name, $oConn);
 
+// 2014-09-18 Need to Remove Hard Coded Vars and Icon Size Fix ^CS
 // 2014-09-12 Created ^CS
 
 // Center Map on Address of Company
@@ -62,33 +63,12 @@ if ($StartDate < date('Y-m-d'))
 else
 {
 	$regenerate = 0;
-	$sql = "SELECT
-			    *
-			FROM
-			    GPSData
-			WHERE
-			    GPSID = :id
-				AND Truck = :truck
-			        AND TimeStamp BETWEEN '$StartDate 00:00:00' AND '$FinishDate 23:59:59'
-			GROUP BY TimeStamp
-			LIMIT 1440";
-	$params = array(':id' => $GPSID, ':truck' => $Truck);
-	$stm = pdo_execute_query($sql, $params);
-	$nearsite = pdo_execute_query($sql, $params);
+	$stm = GPSMaps::GetData($GPSID, $StartDate, $FinishDate);
+	$nearsite = GPSMaps::GetData($GPSID, $StartDate, $FinishDate);
 }
 
 // Get Idle times
-$sql ="SELECT
-		    *
-		FROM
-		    GPSData
-		WHERE
-		    GPSID = :id
-			AND Truck = :truck
-		        AND TimeStamp BETWEEN '$StartDate 00:00:00' AND '$FinishDate 23:59:59'
-		LIMIT 1440";
-$params = array(':id' => $GPSID, ':truck' => $Truck);
-$idle = pdo_execute_query($sql, $params);
+$idle = GPSMaps::GetData($GPSID, $StartDate, $FinishDate);
 $LastEntry = $idle->RowCount();
 $y = 0;
 while ($i = $idle->fetch(PDO::FETCH_OBJ))
@@ -166,8 +146,8 @@ $idleTime = gmdate("H:i:s", $idleTime);
     <script type="text/javascript">
 		function initialize() {
 			var customIcons = {
-				Start: {icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png', size: new google.maps.Size(20, 20)},
-				Finish: {icon: 'http://labs.google.com/ridefinder/images/mm_20_red.png', size: new google.maps.Size(20, 20)},
+				Start: {icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png', size: new google.maps.Size(20, 20), origin: new google.maps.Point(0,0), anchor: new google.maps.Point(10,20)},
+				Finish: {icon: 'http://labs.google.com/ridefinder/images/mm_20_red.png', size: new google.maps.Size(20, 20), origin: new google.maps.Point(0,0), anchor: new google.maps.Point(10,20)},
 				Task: {icon: 'images/maps_images/task1.png', size: new google.maps.Size(20, 20)}
 			};
 			var centerMap = {lat: <?php echo $MyLat;?>, lng: <?php echo $MyLng;?>};
@@ -326,8 +306,6 @@ $idleTime = gmdate("H:i:s", $idleTime);
 
 					<div style="clear: both;">&nbsp;</div>
 
-					<p><?php echo "Time Idle/Working is $idleTime"; ?></p>
-
     				<div id="map-canvas" style="width: 700px; height: 700px;"></div>
 
     				<div style="clear: both;">&nbsp;</div>
@@ -335,6 +313,7 @@ $idleTime = gmdate("H:i:s", $idleTime);
     				<fieldset class="TruckMenu" id="TruckReport">
     				<div id="task_report" style="width: 100%;">
     					<table id="task-locations" style="width: 100%;">
+    						<tr><?php echo "Time Idle/Working : " . $idleTime; ?><br /><br /></tr>
     						<tr>
 	    						<th>Task</th>
 	    						<th>Scheduled Date</th>
