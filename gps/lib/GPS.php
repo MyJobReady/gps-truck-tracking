@@ -140,15 +140,22 @@
     	public static function GetData($GPSID, $StartDate, $FinishDate)
     	{
     		$sql = "SELECT
-			    *
-			FROM
-			    GPSData
-			WHERE
-			    GPSID = :id
-			        AND TimeStamp BETWEEN '$StartDate 00:00:00' AND '$FinishDate 23:59:59'
-			GROUP BY TimeStamp
-			LIMIT 1440";
+					    *
+					FROM
+					    GPSData
+					WHERE
+					    GPSID = :id
+					        AND TimeStamp BETWEEN '$StartDate 00:00:00' AND '$FinishDate 23:59:59'
+					GROUP BY TimeStamp
+					LIMIT 1440";
     		$params = array(':id' => $GPSID,);
+    		return pdo_execute_query($sql, $params);
+    	}
+
+    	public static function GetTruckDropDown($customerid, $trucks)
+    	{
+    		$sql = "SELECT * FROM GPSTruck WHERE Truck = :trucks AND CustomerId = :customerid";
+    		$params = array(':trucks' => $trucks, ':customerid' => $customerid);
     		return pdo_execute_query($sql, $params);
     	}
 
@@ -160,10 +167,13 @@
     		$latTo = deg2rad($latitudeTo);
     		$lonTo = deg2rad($longitudeTo);
 
-    		$lonDelta = $lonTo - $lonFrom;
+			$lonDelta = $lonTo - $lonFrom;
+
     		$a = pow(cos($latTo) * sin($lonDelta), 2) + pow(cos($latFrom) * sin($latTo) - sin($latFrom) * cos($latTo) * cos($lonDelta), 2);
     		$b = sin($latFrom) * sin($latTo) + cos($latFrom) * cos($latTo) * cos($lonDelta);
+
     		$angle = atan2(sqrt($a), $b);
+
     		return $angle * $earthRadius;
     	}
     }

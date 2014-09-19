@@ -3,7 +3,7 @@ require("inc_header_ps.php");
 	require_once('../lib/GPS.php');
 	mysql_select_db($db_name, $oConn);
 
-// 2014-09-18 Need to Remove Hard Coded Vars and Icon Size Fix ^CS
+// 2014-09-19 Need to Remove Hard Coded Vars and Icon Size Fix ^CS
 // 2014-09-12 Created ^CS
 
 // Center Map on Address of Company
@@ -110,6 +110,22 @@ while ($i = $idle->fetch(PDO::FETCH_OBJ))
 
 $idleTime = gmdate("H:i:s", $idleTime);
 
+$yes = 'yes';
+$TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], $yes);
+$TList = array();
+while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
+{
+	if ($TL->TruckDriver == $TruckDriver)
+	{
+		$selected = "selected='selected'";
+	}
+	else
+	{
+		$selected = "";
+	}
+	$TList[] = "<option value='$TL->TruckID' $selected >$TL->TruckName ($TL->TruckSerial)</option>";
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -146,9 +162,9 @@ $idleTime = gmdate("H:i:s", $idleTime);
     <script type="text/javascript">
 		function initialize() {
 			var customIcons = {
-				Start: {icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png', size: new google.maps.Size(20, 20), origin: new google.maps.Point(0,0), anchor: new google.maps.Point(10,20)},
-				Finish: {icon: 'http://labs.google.com/ridefinder/images/mm_20_red.png', size: new google.maps.Size(20, 20), origin: new google.maps.Point(0,0), anchor: new google.maps.Point(10,20)},
-				Task: {icon: 'images/maps_images/task1.png', size: new google.maps.Size(20, 20)}
+				Start: {icon: 'images/maps_images/start.png', size: new google.maps.Size(20, 20), origin: new google.maps.Point(0,0), anchor: new google.maps.Point(10,20)},
+				Finish: {icon: 'images/maps_images/finish.png', size: new google.maps.Size(20, 20), origin: new google.maps.Point(0,0), anchor: new google.maps.Point(10,20)},
+				Task: {icon: 'images/maps_images/regentask.png', size: new google.maps.Size(20, 20)}
 			};
 			var centerMap = {lat: <?php echo $MyLat;?>, lng: <?php echo $MyLng;?>};
   			var mapOptions = {
@@ -221,7 +237,7 @@ $idleTime = gmdate("H:i:s", $idleTime);
 
 			var infoWindowStart = new google.maps.InfoWindow;
 			var type = "Start";
-			var startPoint = <?php echo $startPoint; ?>;
+			var startPoint = "<?php echo $startPoint; ?>";
 			var html = "Start<br/><br/><br/>";
 			var icon = customIcons[type] || {};
 			var marker = new google.maps.Marker({
@@ -233,7 +249,7 @@ $idleTime = gmdate("H:i:s", $idleTime);
 
 			var infoWindowEnd = new google.maps.InfoWindow;
 			var type = "Finish";
-			var endPoint = <?php echo $endPoint; ?>;
+			var endPoint = "<?php echo $endPoint; ?>";
 			var html = "End<br/><br/><br/>";
 			var icon = customIcons[type] || {};
 			var marker = new google.maps.Marker({
@@ -292,12 +308,12 @@ $idleTime = gmdate("H:i:s", $idleTime);
 
 					<fieldset class="TruckMenu" id="TruckReport">
 					<legend>Select Truck and Date</legend>
-						<form action="maps_route_redraw.php" method="post" enctype="application/x-www-form-urlencoded">
+						<form action="map_route_redraw.php" method="post" enctype="application/x-www-form-urlencoded">
 						Date :<input id="Day" name="Day" value="<?php echo $StartDate; ?>"><button type="button" onclick="displayDatePicker('Day', false, 'ymd', '-');"><img src="../images/SmallCalendar.gif"></button>
 						Truck : <select id="Truck" name="TruckID" class="TruckMenu">
 									<option value="0">Select A Truck</option>
 									<option value="0">----------</option>
-									<option value="65600" selected>Test Truck Hardcoded</option>
+									<?php echo implode('', $TList); ?>
 								</select>
 						<input type="hidden" name="run" value="1" />
                         <input type="submit" value="Search" />
@@ -359,7 +375,7 @@ $idleTime = gmdate("H:i:s", $idleTime);
 						</table>
 					</div>
 					</fieldset>
-
+					<span id="adddendium" style="font-size: 8px">*Arrival time is an estimate of time when truck is closest to the job site.</span>
 					<?php
 						//Get the lat/lng of the route
 						$jobslist = GPSMaps::GetTodaysTaskXML($TruckDriver, $StartDate);
@@ -378,6 +394,7 @@ $idleTime = gmdate("H:i:s", $idleTime);
 									$jobLat = $jobLng = "";
 									$jobLat = $jobs[$i]["Lat"];
 									$jobLng = $jobs[$i]["Lng"];
+									$houseNum = $jobs[$i]["JobName"];
 									$distance = round(GPSMaps::VGCD($ns->Latitude, $ns->Longitude, $jobLat, $jobLng, 6371000), 3);
 									if ($distance < 500)
 									{
@@ -388,16 +405,16 @@ $idleTime = gmdate("H:i:s", $idleTime);
 											${"Reached_Timestamp_" . $i} = $ns->TimeStamp;
 										}
 									}
-									//echo "$ns->Latitude $ns->Longitude $ns->TimeStamp <-truck house-> $jobLat AND LNG $jobLng [distance in m $distance] <br />";
+									//echo "$ns->Latitude $ns->Longitude $ns->TimeStamp <-truck house-> $houseNum | $jobLat AND LNG $jobLng [distance in m $distance] <br />";
 									empty($jobLat);
 									empty($jobLng);
 								}
 							}
 
-							for($j = 0; $j < $jobscount; $j++ )
-							{
-								//echo "CLOSEST DISTANCES 200m " . ${"Reached_" . $j} . " " . ${"Reached_Job_" . $j} . " @ " . ${"Reached_Timestamp_" . $j} . "<br />";
-							}
+//							for($j = 0; $j < $jobscount; $j++ )
+//							{
+//								echo "CLOSEST DISTANCES 200m " . ${"Reached_" . $j} . " " . ${"Reached_Job_" . $j} . " @ " . ${"Reached_Timestamp_" . $j} . "<br />";
+//							}
 						}
 						else
 						{
@@ -416,30 +433,28 @@ $idleTime = gmdate("H:i:s", $idleTime);
 									$jobLat = $jobLng = "";
 									$jobLat = $jobs[$l]["Lat"];
 									$jobLng = $jobs[$l]["Lng"];
+									$houseNum = $jobs[$l]["JobName"];
 									$distance = round(GPSMaps::VGCD($RegenLat, $RegenLng, $jobLat, $jobLng, 6371000), 3);
 									if ($distance < 500)
 									{
 										if (${"Reached_" . $l} > $distance)
 										{
 											${"Reached_" . $l} = $distance;
-											${"Reached_Job_" . $l} = $jobs[$i]["JobName"];
+											${"Reached_Job_" . $l} = $jobs[$l]["JobName"];
 											${"Reached_Timestamp_" . $l} = $RegenTimeStamp;
 										}
 									}
-									//echo "Regen LAT is $RegenLat AND Regen LNG is $RegenLng <-truck house-> $jobLat AND LNG $jobLng [distance in m $distance] <br />";
+									//echo "Regen LAT is $RegenLat AND Regen LNG is $RegenLng <-truck house-> $houseNum | $jobLat AND LNG $jobLng [distance in m $distance] <br />";
 									empty($jobLat);
 									empty($jobLng);
 								}
 							}
 
-							for($m = 0; $m < $jobscount; $m++ )
-							{
-								//echo "CLOSEST DISTANCES 200m " . ${"Reached_" . $m} . " " . ${"Reached_Job_" . $m} . " @ " . ${"Reached_Timestamp_" . $m} . "<br />";
-							}
+//							for($m = 0; $m < $jobscount; $m++ )
+//							{
+//								echo "CLOSEST DISTANCES 200m " . ${"Reached_" . $m} . " " . ${"Reached_Job_" . $m} . " @ " . ${"Reached_Timestamp_" . $m} . "<br />";
+//							}
 						}
-						//Compare lat/lng to each task lat/lng
-						//echo *ding* on 50m difference
-						//display all resultos to check
 					?>
 
 				<div style="clear: both;">&nbsp;</div>
