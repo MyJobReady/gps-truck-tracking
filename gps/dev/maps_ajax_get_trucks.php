@@ -10,10 +10,10 @@ $sql = "";
 
 if ($view == "crew")
 {
-	$sql = "SELECT ID, TruckName, TruckID, TruckLicense, LastMaintenance, NextMaintenance, FirstName, LastName FROM GPSTruck LEFT JOIN Users on Users.UserNum = GPSTruck.TruckID WHERE GPSTruck.TruckID = $_SESSION[userNum]";
+	$sql = "SELECT ID, TruckName, TruckID, FirstName, LastName FROM GPSTruck LEFT JOIN Users on Users.UserNum = GPSTruck.TruckID WHERE GPSTruck.TruckID = $_SESSION[userNum]";
 } else
 {
-	$sql = "SELECT ID, TruckName, TruckID, TruckLicense, LastMaintenance, NextMaintenance, FirstName, LastName FROM GPSTruck LEFT JOIN Users on Users.UserNum = GPSTruck.TruckID WHERE CustomerId = $_SESSION[customerId] AND ServiceTech = 0";
+	$sql = "SELECT ID, TruckName, TruckID, FirstName, LastName FROM GPSTruck LEFT JOIN Users on Users.UserNum = GPSTruck.TruckID WHERE CustomerId = $_SESSION[customerId] AND ServiceTech = 0";
 }
 $result = mysql_query($sql, $oConn);
 if ($result == false)

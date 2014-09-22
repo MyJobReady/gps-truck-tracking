@@ -14,9 +14,6 @@ if ($view == "crew")
 				ID,
 				TruckName,
 				TruckID,
-				TruckLicense,
-				LastMaintenance,
-				NextMaintenance,
 				FirstName,
 				LastName
 			FROM
@@ -32,9 +29,6 @@ else
 			    ID,
 			    TruckName,
 			    TruckID,
-			    TruckLicense,
-			    LastMaintenance,
-			    NextMaintenance,
 			    FirstName,
 			    LastName
 			FROM
