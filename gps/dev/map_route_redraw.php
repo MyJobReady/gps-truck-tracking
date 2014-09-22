@@ -27,9 +27,8 @@ $MyLng = $coordinates[1];
 
 // Hardcoded Data, use dropdowns in implementation to get actual truck # and GPS ID
 // Upon Select Date, pick start and end times for the route, 24 hour period by default
-$Truck = isset($_REQUEST['Truck']) ? $_REQUEST['Truck'] : 50;
 $GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : 65600;
-$TruckDriver = isset($_REQUEST['TruckDriver']) ? $_REQUEST['TruckDriver'] : 634;
+$TruckDriver = GPSMaps::GetTruckDriver($GPSID);
 
 $StartDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
 $FinishDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
@@ -237,7 +236,10 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 
 			var infoWindowStart = new google.maps.InfoWindow;
 			var type = "Start";
-			var startPoint = "<?php echo $startPoint; ?>";
+			var startPoint = <?php echo $startPoint; ?>;
+			if (startPoint === undefined) {
+			    startPoint = "";
+		    }
 			var html = "Start<br/><br/><br/>";
 			var icon = customIcons[type] || {};
 			var marker = new google.maps.Marker({
@@ -249,7 +251,10 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 
 			var infoWindowEnd = new google.maps.InfoWindow;
 			var type = "Finish";
-			var endPoint = "<?php echo $endPoint; ?>";
+			var endPoint = <?php echo $endPoint; ?>;
+			if (endPoint === undefined) {
+			    endPoint = "";
+		    }
 			var html = "End<br/><br/><br/>";
 			var icon = customIcons[type] || {};
 			var marker = new google.maps.Marker({

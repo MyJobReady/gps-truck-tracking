@@ -159,6 +159,21 @@
     		return pdo_execute_query($sql, $params);
     	}
 
+    	public static function GetTruckDriver($truckid)
+    	{
+    		$sql = "SELECT TruckDriver FROM GPSTruck WHERE TruckID = :truckid";
+    		$params = array(':truckid' => $truckid);
+    		$stm = pdo_execute_scalar($sql, $params);
+    		if ($stm)
+    		{
+    			return $stm;
+    		}
+    		else
+    		{
+    			return FALSE;
+    		}
+    	}
+
     	public static function VGCD($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000)
     	{
     		// Great-Circle Distance convert from degrees to radians
