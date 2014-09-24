@@ -1,16 +1,16 @@
 <?php
     require "aware_getGPSData.php";
-    
+
     /*
      * This function assumes calculation per day.
-     * 
+     *
      * Calculates :
      *      startTime   When the truck first starts moving in the day
      *      stopTime    When the truck stops moving for the last time in the day
      *      mileage     The amount of miles travelled this day (there is a small margin of error in this calculation that cannot be avoided)
      *      idleTime    The amount of time in the day the truck isn't moving
      *      runningTime The amount of time in the day the truck is moving
-     * 
+     *
      * The returned array looks like:
      * Array (
      *      [0] => Array (
@@ -23,7 +23,7 @@
      *          "stopTimer" => array of stop times)
      *      ....
      * )
-     * 
+     *
      */
     function calculateMetrics($rawData){
         $data = array();
@@ -33,15 +33,15 @@
         $stopTimerArray = array();
 
         $prevTime = $prevLat = $prevLng = $prevMileage = NULL;
-       
+
         foreach ($rawData as $entry){
             $currentTruckId = $entry['Truck'];
             $time = $entry['TimeStamp'];
             $lat = $entry['Latitude'];
             $lng = $entry['Longitude'];
-                   
+
             if ($workingTruckId == NULL) { $workingTruckId = $currentTruckId; }
-            
+
             //Save metrics and prepare to process new truck
             elseif ($workingTruckId != $currentTruckId) {
                 $data[] = compileDataForCalculateMetrics($workingTruckId, $startTime, $stopTime, $mileage, $idleTime, $runningTime, $stopTimerArray);
@@ -50,28 +50,28 @@
                 $stopTimerArray = array();
                 $workingTruckId = $currentTruckId;
             }
-            
+
             //Mileage
             $mileage += calculateDistance($lat, $lng, $prevLat, $prevLng);
-            
+
             //StartTime
             if ($mileage > 0 && $startTime === NULL){
                 $startTime = $prevTime;
                 $stopTime = $prevTime;
             }
-            
+
             //StopTime
             if ($prevMileage !== $mileage){ $stopTime = $time; }
-            
+
             //IdleTime
             if ($prevMileage === $mileage){ $idleTime += strtotime($time) - strtotime($prevTime); }
-            
+
             //RunningTime
             if ($prevMileage < $mileage){ $runningTime += strtotime($time) - strtotime($prevTime); }
-            
+
             //How long was each stop
             if (stopTimerCalculator($startTime, $prevMileage, $mileage, $time, &$stopTimerStart, &$stopTimerStop)){
-                $stopTimerArray[] = array('start'=>$stopTimerStart, 'stop'=>$stopTimerStop);
+                $stopTimerArray[] = array('start'=>$stopTimerStart, 'stop'=>$stopTimerStop, 'lat'=>$lat, 'lng'=>$lng);
                 unset($stopTimerStart, $stopTimerStop);
             }
 
@@ -80,14 +80,14 @@
             $prevTime = $time;
             $prevLat = $lat;
             $prevLng = $lng;
-            $prevMileage = $mileage; 
+            $prevMileage = $mileage;
         }
-        
+
         $data[] = compileDataForCalculateMetrics($workingTruckId, $startTime, $stopTime, $mileage, $idleTime, $runningTime, $stopTimerArray);
 
         return $data;
     }
-    
+
     function getGPSDataByDay($day, $companyId){
         $startDate = ($day instanceof DateTime) ? clone $day :  new DateTime($day);
         $startDate->setTime(0,0,0);
@@ -109,19 +109,19 @@
          *          ['Longitude'] => longitude ),
          *      ...
          * )
-         * 
+         *
          * The data is ordered by Truck (truckID) and TimeStamp.
-         * 
+         *
          */
         $data = getGPSData( //defined in aware_getGPSData.php
-                $startDate->format("Y-m-d H:i:s"), 
-                $endDate->format("Y-m-d H:i:s") , 
+                $startDate->format("Y-m-d H:i:s"),
+                $endDate->format("Y-m-d H:i:s") ,
                 $companyId
-        ); 
+        );
 
-        return calculateMetrics($data);   
+        return calculateMetrics($data);
     }
-    
+
     /**
      * Returns an Array with the format:
      * Array (
@@ -145,9 +145,9 @@
      *          )
      *      )
      *      ....
-     *  
-     * 
-     * 
+     *
+     *
+     *
      * @param type $startDate
      * @param type $endDate
      * @param type $companyId
@@ -156,9 +156,9 @@
      */
     function getMetrics($startDate, $endDate, $companyId, $calculatIfMissing, $updateIfToday){
         //TODO load computed metrics from datastore
-        
+
         $data = array();
-        
+
         //iterate days by use linux date stamps and adding 86400 seconds each time
         $date = new DateTime($startDate);
         $date->setTime(0,0,0);
@@ -170,7 +170,7 @@
           $currentIntDate = $startIntDate;
           do {
             $date->setTimestamp($currentIntDate);
-            
+
             $data[] = array(
                 'date' => clone $date,
                 'data' => getGPSDataByDay($date, $companyId)
@@ -179,9 +179,9 @@
         } while ($currentIntDate <= $endIntDate);
 
         return $data;
-        
+
     }
-    
+
     function calculateDistance($latitude1, $longitude1, $latitude2, $longitude2) {
         if ($latitude1 === NULL || $longitude1 === NULL || $latitude2 === NULL || $longitude2 === NULL){
             return 0;
@@ -194,9 +194,9 @@
         $miles = acos($miles);
         $miles = rad2deg($miles);
         $miles = $miles * 60 * 1.1515;
-        return $miles; 
+        return $miles;
     }
-    
+
     function compileDataForCalculateMetrics($truckId, $startTime, $stopTime, $mileage, $idleTime, $runningTime, $stopTimerArray){
         return array(
             'truckId' => $truckId,
@@ -208,7 +208,7 @@
             'stopTimer' => $stopTimerArray
         );
     }
-    
+
     /*
      * Returns true when $stopTimerStart and $stopTimerStop are set.
      */

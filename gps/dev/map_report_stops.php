@@ -1,0 +1,167 @@
+<?php
+require("inc_header_ps.php");
+require("aware_report.php");
+	require_once('../lib/GPS.php');
+	mysql_select_db($db_name, $oConn);
+
+// 2014-09-24 Created ^CS
+
+function echoStopTimer($stopTimer)
+{
+	$x = 1;
+	foreach ($stopTimer as $timer)
+	{
+		if ($x % 2 != 0)
+		{
+			$style = "style='background-color:#EEEEEE'";
+		}
+		else
+		{
+			$style = "style='background-color:#FFFFFF'";
+		}
+
+		$timeInSeconds = strtotime($timer['stop']) - strtotime($timer['start']);
+		if ($timeInSeconds > 240) // 4 Minutes
+		{
+			echo "<tr $style>";
+			echo "<td>" . $timer['start'] . "</td>";
+			echo "<td>" . $timer['stop'] . "</td>";
+			echo "<td>" . gmdate("H:i:s", $timeInSeconds) . "</td>";
+			echo "<td>" . $timer['lat'] . " " . $timer['lng'] . "</td>";
+			echo "</tr>";
+			$x++;
+		}
+	}
+}
+
+// Hardcoded Data, use dropdowns in implementation to get actual truck # and GPS ID
+// Upon Select Date, pick start and end times for the route, 24 hour period by default
+$GPSID 			= isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : 65600;
+$TruckDriver 	= GPSMaps::GetTruckDriver($GPSID);
+$StartDate 		= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+$FinishDate 	= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+if ($StartDate == '')
+{
+	$StartDate  = $_POST['Day'];
+	$FinishDate = $_POST['Day'];
+}
+
+$data = getMetrics($StartDate, $FinishDate, $_SESSION['customerId'], true, true);
+
+
+$yes = 'yes';
+$TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], $yes);
+$TList = array();
+while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
+{
+	if ($TL->TruckDriver == $TruckDriver)
+	{
+		$selected = "selected='selected'";
+	}
+	else
+	{
+		$selected = "";
+	}
+	$TList[] = "<option value='$TL->TruckID' $selected >$TL->TruckName ($TL->TruckSerial)</option>";
+}
+
+?>
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<?php require("inc_page_head.php"); ?>
+		<style>
+			#TruckReport{
+				border-radius:10px;
+				border: 1px solid #000000;
+				color:#000;
+				font:normal 12px Verdana, Arial, Helvetica, sans-serif;
+			}
+    	</style>
+	</head>
+	<body>
+		<a id="joblogo" href="index.php">JobReady</a>
+			<div id="header">
+				<?php require("inc_nav_menu.php"); ?>
+			</div>
+			<div style="clear: both;">&nbsp;</div>
+				<div id="container">
+				<div id='loading'>&nbsp;</div>
+					<div id="wrapper">
+						<div id="sidebar">
+							<?php require("inc_alerts.php"); ?>
+						</div>
+						<div id="content">
+							<div id="page_header">
+								<span>Stop Report</span>
+								<div class="headerlink"></div>
+							</div> <!-- end page_header -->
+
+							<div style="clear: both;">&nbsp;</div>
+
+							<fieldset class="TruckMenu" id="TruckReport">
+							<legend>Select Truck and Date</legend>
+								<form action="map_report_stops.php" method="post" enctype="application/x-www-form-urlencoded">
+								Date :<input id="Day" name="Day" value="<?php echo $StartDate; ?>"><button type="button" onclick="displayDatePicker('Day', false, 'ymd', '-');"><img src="../images/SmallCalendar.gif"></button>
+								Truck : <select id="Truck" name="TruckID" class="TruckMenu">
+											<option value="0">Select A Truck</option>
+											<option value="0">----------</option>
+											<option value="ALL">All Trucks</option>
+											<?php echo implode('', $TList); ?>
+										</select>
+								<input type="hidden" name="run" value="1" />
+		                        <input type="submit" value="Search" />
+		                        </form>
+							</fieldset>
+
+							<div style="clear: both;">&nbsp;</div>
+
+							<?php
+								foreach ($data as $entry)
+								{
+									$time = $entry['date'];
+									$count = count($entry['data']);
+
+									for ($i = 0; $i < $count; $i++)
+									{
+										$metrics = $entry['data'][$i];
+										$truckId = $metrics['truckId'];
+										$startTime = $metrics['startTime'];
+										$stopTime = $metrics['stopTime'];
+										$mileage = $metrics['mileage'];
+										$idleTime = $metrics['idleTime'];
+										$runningTime = $metrics['runningTime'];
+										$stopTimer = $metrics['stopTimer'];
+
+										echo "<fieldset id='TruckReport'>";
+										echo "<b>TruckId :</b>" . $truckId . "<br>";
+										echo "<b>Start Time : </b>" . $startTime .  "<br>";
+										echo "<b>Stop Time : </b>" . $stopTime .  "<br>";
+										echo "<b>Mileage : </b>" . round($mileage, 2) .  " miles <br>";
+										echo "<b>Idle Time : </b>" . gmdate("H:i:s",$idleTime) .  "<br>";
+										echo "<b>Running Time : </b>" . gmdate("H:i:s", $runningTime) .  "<br>";
+										echo "</fieldset>";
+										echo "<div style='clear: both;'>&nbsp;</div>";
+										echo "<fieldset id='TruckReport'>";
+										echo "<legend>Stop Times</legend>";
+										echo "<table width='100%'><tr><th>Start Time</th><th>End Time</th><th>Stop Duration</th><th>Location</th></tr>";
+										echoStopTimer($stopTimer);
+										echo "</table>";
+										echo "</fieldset>";
+									}
+								}
+							?>
+
+							<div style="clear: both;">&nbsp;</div>
+
+							<div style="clear: both;">&nbsp;</div>
+						</div> <!-- end content -->
+						<div style="clear: both;">&nbsp;</div>
+					</div> <!-- end wrapper -->
+					<div style="clear: both;">&nbsp;</div>
+				</div> <!-- end container -->
+		<iframe src="../keep_alive.php" width="0px" height="0px" frameborder="0" style="visibility:hidden"></iframe>
+	</body>
+</html>
