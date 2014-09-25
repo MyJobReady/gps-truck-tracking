@@ -21,7 +21,7 @@ function echoStopTimer($stopTimer)
 		}
 
 		$timeInSeconds = strtotime($timer['stop']) - strtotime($timer['start']);
-		if ($timeInSeconds > 240) // 4 Minutes
+		if ($timeInSeconds < 240) // 4 Minutes
 		{
 			echo "<tr $style>";
 			echo "<td>" . $timer['start'] . "</td>";
@@ -113,7 +113,7 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 						</div>
 						<div id="content">
 							<div id="page_header">
-								<span>GPS Truck Stopping Report</span>
+								<span>GPS Truck Idle Report</span>
 								<div class="headerlink"></div>
 							</div> <!-- end page_header -->
 
@@ -155,12 +155,12 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 										echo "<b style='width:200px;float:left;'>Start Time : </b>" . $startTime .  "<br>";
 										echo "<b style='width:200px;float:left;'>Stop Time : </b>" . $stopTime .  "<br>";
 										echo "<b style='width:200px;float:left;'>Mileage : </b>" . round($mileage, 2) .  " miles <br>";
-										echo "<b style='width:200px;float:left;'>Running Time : </b>" . gmdate("H:i:s", $runningTime) .  "<br>";
+										echo "<b style='width:200px;float:left;'>Idle Time : </b>" . gmdate("H:i:s",$idleTime) .  "<br>";
 										echo "</fieldset>";
 										echo "<div style='clear: both;'>&nbsp;</div>";
 										echo "<fieldset id='TruckReport'>";
 										echo "<legend>Stop Times</legend>";
-										echo "<table width='100%'><tr><th>Start Time</th><th>End Time</th><th>Stop Duration</th><th>Location</th></tr>";
+										echo "<table width='100%'><tr><th>Start Time</th><th>End Time</th><th>Idle Duration</th><th>Location</th></tr>";
 										echoStopTimer($stopTimer);
 										echo "</table>";
 										echo "</fieldset>";

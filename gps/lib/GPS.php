@@ -1,6 +1,7 @@
 <?php
 
     require_once('pdo.php');
+    require_once('../_private/ps_log.php');
 
     class GPSMaps
     {
@@ -190,6 +191,27 @@
     		$angle = atan2(sqrt($a), $b);
 
     		return $angle * $earthRadius;
+    	}
+
+    	public static function ReverseGeocoding($lat, $lng)
+    	{
+    		// Get the Lat and Lng of a Location and return its physical address
+    		$key = "AIzaSyBqFUMSIPpWNIvAZ547I-uaKT0c2fBoQME";
+    		$url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=".$lat.",".$lng."&key=" . $key;
+    		$ch = curl_init($url);
+    		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    		$results =  curl_exec($ch);
+    		$data = json_decode($results, TRUE);
+    		curl_close($ch);
+    		if ($data['status'] == "OK")
+    		{
+    			return $data['results'][0]['formatted_address'];
+    		}
+    		else
+    		{
+    			ps_log("[REVERSE GEOCODING] Error - " . $data['status']);
+    			return FALSE;
+    		}
     	}
     }
 

@@ -334,7 +334,6 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
     				<fieldset class="TruckMenu" id="TruckReport">
     				<div id="task_report" style="width: 100%;">
     					<table id="task-locations" style="width: 100%;">
-    						<tr><?php echo "Time Idle/Working : " . $idleTime; ?><br /><br /></tr>
     						<tr>
 	    						<th>Task</th>
 	    						<th>Scheduled Date</th>
