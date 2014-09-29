@@ -9,6 +9,7 @@ require("aware_report.php");
 function echoStopTimer($stopTimer)
 {
 	$x = 1;
+	$idleTimer = 0;
 	foreach ($stopTimer as $timer)
 	{
 		if ($x % 2 != 0)
@@ -23,6 +24,7 @@ function echoStopTimer($stopTimer)
 		$timeInSeconds = strtotime($timer['stop']) - strtotime($timer['start']);
 		if ($timeInSeconds < 240) // 4 Minutes
 		{
+			$idleTimer += $timeInSeconds;
 			echo "<tr $style>";
 			echo "<td>" . $timer['start'] . "</td>";
 			echo "<td>" . $timer['stop'] . "</td>";
@@ -40,11 +42,17 @@ function echoStopTimer($stopTimer)
 			$x++;
 		}
 	}
+	echo "<tr>";
+	echo "<td></td>";
+	echo "<td>Total Idle Time:</td>";
+	echo "<td>". gmdate("H:i:s", $idleTimer) ."</td>";
+	echo "<td></td>";
+	echo "</tr>";
 }
 
 // Hardcoded Data, use dropdowns in implementation to get actual truck # and GPS ID
 // Upon Select Date, pick start and end times for the route, 24 hour period by default
-$GPSID 			= isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : 65600;
+$GPSID 			= isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : '';
 $TruckDriver 	= GPSMaps::GetTruckDriver($GPSID);
 $StartDate 		= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
 $FinishDate 	= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
@@ -121,7 +129,7 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 
 							<fieldset class="TruckMenu" id="TruckReport">
 							<legend>Select Truck and Date</legend>
-								<form action="map_report_stops.php" method="post" enctype="application/x-www-form-urlencoded">
+								<form action="map_report_idle.php" method="post" enctype="application/x-www-form-urlencoded">
 								Date :<input id="Day" name="Day" value="<?php echo $StartDate; ?>"><button type="button" onclick="displayDatePicker('Day', false, 'ymd', '-');"><img src="../images/SmallCalendar.gif"></button>
 								Truck : <select id="Truck" name="TruckID" class="TruckMenu">
 											<option value="0">Select A Truck</option>
@@ -155,7 +163,6 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 										echo "<b style='width:200px;float:left;'>Start Time : </b>" . $startTime .  "<br>";
 										echo "<b style='width:200px;float:left;'>Stop Time : </b>" . $stopTime .  "<br>";
 										echo "<b style='width:200px;float:left;'>Mileage : </b>" . round($mileage, 2) .  " miles <br>";
-										echo "<b style='width:200px;float:left;'>Idle Time : </b>" . gmdate("H:i:s",$idleTime) .  "<br>";
 										echo "</fieldset>";
 										echo "<div style='clear: both;'>&nbsp;</div>";
 										echo "<fieldset id='TruckReport'>";

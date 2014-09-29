@@ -108,7 +108,7 @@ if ($view != "crew")
 			<div id="content">
 				<div id="page_header">
 					<span>Mapping and Routing</span>
-					<div class="headerlink"><a href="maps_expanded.php">Expand Map</a> | <a href="maps_trucks.php">View/Edit Trucks and Drivers</a></div>
+					<div class="headerlink"><a href="maps_reporting.php">Reporting</a> | <a href="maps_expanded.php">Expand Map</a> | <a href="maps_trucks.php">View/Edit Trucks and Drivers</a></div>
 					<div class="pace"></div>
 				</div> <!-- end page_header -->
 				<div style="clear: both;">&nbsp;</div>
