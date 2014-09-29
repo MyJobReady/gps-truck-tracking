@@ -27,7 +27,7 @@ $MyLng = $coordinates[1];
 
 // Hardcoded Data, use dropdowns in implementation to get actual truck # and GPS ID
 // Upon Select Date, pick start and end times for the route, 24 hour period by default
-$GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : 65600;
+$GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : '';
 $TruckDriver = GPSMaps::GetTruckDriver($GPSID);
 
 $StartDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
