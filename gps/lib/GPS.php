@@ -155,7 +155,7 @@
 
     	public static function GetTruckDropDown($customerid, $trucks)
     	{
-    		$sql = "SELECT * FROM GPSTruck WHERE Truck = :trucks AND CustomerId = :customerid";
+    		$sql = "SELECT * FROM GPSTruck LEFT JOIN Users ON (Users.UserNum = GPSTruck.TruckDriver) WHERE Truck = :trucks AND CustomerId = :customerid";
     		$params = array(':trucks' => $trucks, ':customerid' => $customerid);
     		return pdo_execute_query($sql, $params);
     	}
