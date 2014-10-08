@@ -5,7 +5,7 @@
     require 'aware_cred.php';
     require 'aware_curl.php';
 
-    $truckId = 50;
+    $truckId = 275;
 
     $data = json_encode(array(
         "username" => $username,

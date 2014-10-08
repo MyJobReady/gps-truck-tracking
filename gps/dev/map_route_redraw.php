@@ -27,8 +27,15 @@ $MyLng = $coordinates[1];
 
 // Hardcoded Data, use dropdowns in implementation to get actual truck # and GPS ID
 // Upon Select Date, pick start and end times for the route, 24 hour period by default
-$GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : '';
-$TruckDriver = GPSMaps::GetTruckDriver($GPSID);
+$GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : -1;
+if ($GPSID != -1)
+{
+	$TruckDriver = GPSMaps::GetTruckDriver($GPSID);
+}
+else
+{
+	$TruckDriver = -1;
+}
 
 $StartDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
 $FinishDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
@@ -316,8 +323,8 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 						<form action="map_route_redraw.php" method="post" enctype="application/x-www-form-urlencoded">
 						Date :<input id="Day" name="Day" value="<?php echo $StartDate; ?>"><button type="button" onclick="displayDatePicker('Day', false, 'ymd', '-');"><img src="../images/SmallCalendar.gif"></button>
 						Truck : <select id="Truck" name="TruckID" class="TruckMenu">
-									<option value="0">Select A Truck</option>
-									<option value="0">----------</option>
+									<option value="-1">Select A Truck</option>
+									<option value="-2">----------</option>
 									<?php echo implode('', $TList); ?>
 								</select>
 						<input type="hidden" name="run" value="1" />

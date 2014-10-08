@@ -130,9 +130,9 @@
 							LEFT JOIN
 						Users w ON (w.UserNum = e.AssignedSubcontractorID)
 					WHERE
-					    (e.AssignedUserID = :driver
+					    ((e.AssignedUserID = :driver
 					        OR e.AssignedSubcontractorID = :driver)
-					        AND e.ScheduledDate = :dated
+					        AND e.ScheduledDate = :dated)
 					ORDER BY e.ClosedDate";
 			$params = array(':driver' => $driver, ':dated' => $dated);
 			return pdo_execute_query($sql, $params);
@@ -172,6 +172,28 @@
     		else
     		{
     			return FALSE;
+    		}
+    	}
+
+    	public static function GetAverageSpeed($truckid)
+    	{
+    		$sql = "SELECT Speed FROM GPSDataTruck WHERE GPSID = :truckid AND DATE(TimeStamp) = CURDATE() AND Speed > 0";
+    		$params = array(':truckid' => $truckid);
+    		$stm = pdo_execute_query($sql, $params);
+    		if ($stm)
+    		{
+    			$totalspeed = 0;
+    			$x = 0;
+    			while ($s = $stm->fetch(PDO::FETCH_OBJ))
+    			{
+    				$totalspeed += $s->Speed;
+    				$x++;
+    			}
+    			return round($totalspeed/$x, 2);
+    		}
+    		else
+    		{
+    			return 0;
     		}
     	}
 

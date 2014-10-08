@@ -1,8 +1,15 @@
 <?php
 require("inc_header_ps.php");
+require("aware_report.php");
+	require_once("../lib/GPS.php");
 	mysql_select_db($db_name, $oConn);
 
 // 2014-09-29 Created ^CS
+
+$stm = GPSMaps::GetTruckDropDown($_SESSION['customerId'], 'yes'); // CustomerID and Truck Columns
+$Date = date('Y-m-d');
+$data = getMetrics($Date, $Date, $_SESSION['customerId'], true, true);
+$TruckCount = $stm->RowCount();
 
 ?>
 
@@ -15,9 +22,14 @@ require("inc_header_ps.php");
 		#newreporting{
 			border-radius:10px;
 			border: 1px solid #0099FF;
-			padding: 10px 0px 10px 20px;
+			padding: 10px 10px 10px 20px;
 			color:#000;
 			font:normal 12px Verdana, Arial, Helvetica, sans-serif;
+		}
+		.FakeLink{
+			text-decoration: underline;
+			color: #0099FF;
+			cursor: pointer;
 		}
 		</style>
 	</head>
@@ -36,7 +48,7 @@ require("inc_header_ps.php");
 						<div id="content">
 							<div id="page_header">
 								<span>GPS and Truck Reporting</span>
-								<div class="headerlink"></div>
+								<div class="headerlink"><a href='maps.php'>Return to GPS</a></div>
 							</div> <!-- end page_header -->
 							<div style="clear: both;">&nbsp;</div>
 
@@ -57,7 +69,62 @@ require("inc_header_ps.php");
 
 							<div style="clear: both;">&nbsp;</div>
 
-							Overview here?
+							<fieldset id='newreporting'>
+							<legend>Truck Information for <?php echo date('Y-m-d'); echo "&nbsp;|&nbsp;<span class='FakeLink' value='show_all'>Show All Supers</span>"; ?></legend>
+							<table width='100%'>
+								<?php
+									foreach ($data as $entry)
+									{
+										$count = count($entry['data']);
+										for ($i = 0; $i < $count; $i++)
+										{
+											$metrics = $entry['data'][$i];
+											$truckId = $metrics['truckId'];
+											$mileage = $metrics['mileage'];
+										}
+									}
+
+									$x = 0;
+									$i = 1;
+									echo "<tr>";
+									while ($t = $stm->fetch(PDO::FETCH_OBJ))
+									{
+										if ($x < 3)
+										{
+											echo "<td id='truck$i'>";
+											echo "<fieldset class='gps' id='newreporting' style='width:auto;'>";
+											echo "<legend>$t->TruckName (<span class='FakeLink' value='$i'>hide</span>)</legend>";
+											echo "Current Driver: $t->FirstName $t->LastName<br />";
+											echo "Mileage: " . round($mileage, 2) . " Miles<br />";
+											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckID) . " MPH <br />";
+											echo "Grade: TBD<br />";
+											echo "</fieldset>";
+											echo "</td>";
+											$x++;
+											$i++;
+										}
+										else
+										{
+											// Reset Row
+											$x = 0;
+											echo "</tr><tr>";
+											echo "<td id='truck$i'>";
+											echo "<fieldset class='gps' id='newreporting' style='width:auto;'>";
+											echo "<legend>$t->TruckName (<span class='FakeLink' value='$i'>hide</span>)</legend>";
+											echo "Current Driver: $t->FirstName $t->LastName<br />";
+											echo "Mileage: " . round($mileage, 2) . " Miles<br />";
+											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckID) . " MPH <br />";
+											echo "Grade: TBD<br />";
+											echo "</fieldset>";
+											echo "</td>";
+											$x++;
+											$i++;
+										}
+									}
+								?>
+								</tr>
+							</table>
+							</fieldset>
 
 							<div style="clear: both;">&nbsp;</div>
 						</div> <!-- end content -->
@@ -66,5 +133,15 @@ require("inc_header_ps.php");
 					<div style="clear: both;">&nbsp;</div>
 				</div> <!-- end container -->
 		<iframe src="../keep_alive.php" width="0px" height="0px" frameborder="0" style="visibility:hidden"></iframe>
+	<script type='text/javascript'>
+		$(".FakeLink").click(function(){
+			// show all this attr val is show_all
+			var hide = $(this).attr('value');
+			$("#truck" + hide).hide();
+			if (hide == "show_all") {
+				$("[id^='truck']").show();
+			}
+		});
+	</script>
 	</body>
 </html>
