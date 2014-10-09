@@ -1,9 +1,10 @@
 <?php
-    require("inc_header_ps.php");
+require("inc_header_ps.php");
+require("../_private/ps_log.php");
+require("aware_cred.php");
+require("aware_curl.php");
     require_once('../lib/pdo.php');
     require_once('../lib/Relationship.php');
-    require 'aware_cred.php';
-    require 'aware_curl.php';
 
     $truckId = 275;
 
@@ -20,7 +21,9 @@
     }
 
     $positions = $dump['data']['positions'];
-    //update only driverId 65600 to truck 50
+
+    // Update only driverId 65600 to truck 275 (Jamie)
+
     for ($i = 0; $i < count($positions); $i++)
     {
         $device = $positions[$i];
@@ -37,6 +40,10 @@
 
         if ($driverId == '65600')
         {
+        	if ($behaviour <> '')
+        	{
+        		ps_log("[AWARE CURL] Variable Value for behaviour from device[behaviorCd] is " . $behaviour);
+        	}
             GPSData($truckId, $driverId, $date/1000, $lat, $lng);
             GPSDataTruck($truckId, $driverId, $date/1000, $heading, $direction, $speed, $speeding, $behaviour, $estSpeedLimit);
         }

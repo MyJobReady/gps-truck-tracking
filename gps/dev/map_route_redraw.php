@@ -313,7 +313,7 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 			<div id="content">
 				<div id="page_header">
 					<span>Truck Route Review</span>
-					<div class="headerlink"></div>
+					<div class="headerlink"><a href='maps_reporting.php'>Return to Map Reporting</a></div>
 					<div class="pace"></div>
 				</div> <!-- end page_header -->
 				<div style="clear: both;">&nbsp;</div>

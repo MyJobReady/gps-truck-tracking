@@ -62,7 +62,7 @@ $TruckCount = $stm->RowCount();
 									</tr>
 									<tr>
 										<td><img src="images/Report.gif"/> <a href="map_report_driving_details.php">Truck Speeding/Braking Report</a></td>
-										<td><img src="images/Report.gif"/> <a href="map_report_stops.php">Truck Idling Report</a></td>
+										<td><img src="images/Report.gif"/> <a href="map_report_idle.php">Truck Idling Report</a></td>
 									</tr>
 								</table>
 							</fieldset>
