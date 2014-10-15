@@ -270,15 +270,41 @@
     	public static function GetAddressSite($customerid)
     	{
     		$sql = "SELECT
-						*
+					    Neighborhoods . *,
+					    (SELECT
+					            UserNum
+					        FROM
+					            Users_Neighborhoods
+					        WHERE
+					            Users_Neighborhoods.NeighborhoodNum = Neighborhoods.NeighborhoodNum
+					                AND Neighborhoods.CustomerId = :customerid
+					        LIMIT 1) AS Supervisor
 					FROM
 					    Neighborhoods
 					WHERE
 					    Neighborhoods.CustomerId = :customerid
+					        AND Neighborhoods.Active = 'yes'
 					        AND Neighborhoods.Lat IS NOT NULL
 					        AND Neighborhoods.Lng IS NOT NULL
 					        AND Neighborhoods.Lat != '0.00000'
-					        AND Neighborhoods.Lng != '0.00000'";
+					        AND Neighborhoods.Lng != '0.00000'
+					ORDER BY Neighborhoods.NeighborhoodNum";
+    		$params = array(':customerid' => $customerid);
+    		return pdo_execute_query($sql, $params);
+    	}
+
+    	public static function GetSupervisor($customerid)
+    	{
+    		$sql = "SELECT
+						CustomerUserMap.UserNum,
+						CONCAT_WS(' ', Users.LastName, Users.FirstName) AS UserName
+					FROM
+					    CustomerUserMap
+					    	JOIN
+					    Users ON Users.UserNum = CustomerUserMap.UserNum
+					WHERE
+					    CustomerUserMap.CustomerId = :customerid
+					        AND CustomerUserMap.Relationship = 'super' ";
     		$params = array(':customerid' => $customerid);
     		return pdo_execute_query($sql, $params);
     	}
