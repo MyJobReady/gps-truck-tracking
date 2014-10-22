@@ -46,6 +46,23 @@ class Trucks
 	}
 
 	/**
+	 * Adds the Truck to the database using its ID as a row check.
+	 */
+	public function ServiceInsert()
+	{
+		$sql = "INSERT INTO GPSTruck (TruckName, TruckID, ServiceTech, CustomerId)
+                        VALUES (:tname, :tid, :servicetech, :customerid)";
+		$params = array(
+		    ':tname' => $this->TruckName,
+		    ':tid' => $this->TruckID,
+		    ':servicetech' => $this->ServiceTech,
+		    ':customerid' => $this->CustomerId
+		);
+
+		$this->ID = pdo_execute_non_query_with_identity($sql, $params, 'ID');
+	}
+
+	/**
 	 * Deletes a Truck from the database
 	 * @param int $ID The Row ID
 	 * @return bool inidcates success
