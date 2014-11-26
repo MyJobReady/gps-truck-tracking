@@ -8,6 +8,20 @@ require("aware_curl.php");
 
     $truckId = 275;
 
+    //Build truckid table ^IM 11/26/2014
+    $truckTable = array();
+    $sql = "SELECT * FROM GPSTruck";
+    $params = array();
+    $stm = pdo_execute_query($sql, $params);
+
+    while ($t = $stm->fetch(PDO::FETCH_OBJ))
+    {
+        $id = $t->TruckID;
+        $serial = $t->TruckSerial;
+        $truckTable[$id] = $serial;
+       
+    }
+
     $data = json_encode(array(
         "username" => $username,
         "password" => $password
@@ -22,7 +36,6 @@ require("aware_curl.php");
 
     $positions = $dump['data']['positions'];
 
-    // Update only driverId 65600 to truck 275 (Jamie)
 
     for ($i = 0; $i < count($positions); $i++)
     {
@@ -37,16 +50,24 @@ require("aware_curl.php");
         $speeding = $device['speeding'];
         $behaviour = $device['behaviorCd'];
         $estSpeedLimit = $device['estSpeedLimit'];
+	$serialNumber = $device['deviceSerialNumber'];
 
-        if ($driverId == '65600')
-        {
-        	if ($behaviour <> '')
-        	{
-        		ps_log("[AWARE CURL] Variable Value for behaviour from device[behaviorCd] is " . $behaviour);
-        	}
+ 	$truckId = array_search($serialNumber, $truckTable);
+        
+        if ($truckId != NULL){
             GPSData($truckId, $driverId, $date/1000, $lat, $lng);
             GPSDataTruck($truckId, $driverId, $date/1000, $heading, $direction, $speed, $speeding, $behaviour, $estSpeedLimit);
         }
+
+        //if ($driverId == '65600')
+        //{
+        //	if ($behaviour <> '')
+        //	{
+        //		ps_log("[AWARE CURL] Variable Value for behaviour from device[behaviorCd] is " . $behaviour);
+        //	}
+        //    GPSData($truckId, $driverId, $date/1000, $lat, $lng);
+        //    GPSDataTruck($truckId, $driverId, $date/1000, $heading, $direction, $speed, $speeding, $behaviour, $estSpeedLimit);
+        //}
     }
 
     function GPSData($Truck, $GPSID, $TimeStamp, $Latitude, $Longitude)
