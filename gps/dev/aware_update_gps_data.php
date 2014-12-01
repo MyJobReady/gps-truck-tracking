@@ -10,7 +10,7 @@ require("aware_curl.php");
 
     //Build truckid table ^IM 11/26/2014
     $truckTable = array();
-    $sql = "SELECT * FROM GPSTruck";
+    $sql = "SELECT * FROM GPSTruck WHERE TruckSerial IS NOT NULL";
     $params = array();
     $stm = pdo_execute_query($sql, $params);
 
@@ -19,7 +19,7 @@ require("aware_curl.php");
         $id = $t->TruckID;
         $serial = $t->TruckSerial;
         $truckTable[$id] = $serial;
-       
+
     }
 
     $data = json_encode(array(
@@ -50,10 +50,10 @@ require("aware_curl.php");
         $speeding = $device['speeding'];
         $behaviour = $device['behaviorCd'];
         $estSpeedLimit = $device['estSpeedLimit'];
-	$serialNumber = $device['deviceSerialNumber'];
+		$serialNumber = $device['deviceSerialNumber'];
 
- 	$truckId = array_search($serialNumber, $truckTable);
-        
+ 		$truckId = array_search($serialNumber, $truckTable);
+
         if ($truckId != NULL){
             GPSData($truckId, $driverId, $date/1000, $lat, $lng);
             GPSDataTruck($truckId, $driverId, $date/1000, $heading, $direction, $speed, $speeding, $behaviour, $estSpeedLimit);

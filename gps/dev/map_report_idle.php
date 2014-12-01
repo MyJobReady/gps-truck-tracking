@@ -71,7 +71,6 @@ if ($StartDate == '')
 
 $data = getMetrics($StartDate, $FinishDate, $_SESSION['customerId'], true, true);
 
-
 $yes = 'yes';
 $TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], $yes);
 $TList = array();
@@ -85,7 +84,7 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 	{
 		$selected = "";
 	}
-	$TList[] = "<option value='$TL->TruckID' $selected >$TL->TruckName ($TL->TruckSerial)</option>";
+	$TList[] = "<option value='$TL->TruckPart' $selected >$TL->TruckName ($TL->TruckSerial)</option>";
 }
 
 ?>

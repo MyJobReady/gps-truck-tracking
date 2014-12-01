@@ -19,7 +19,7 @@
             FROM
                 GPSData
             LEFT JOIN GPSTruck
-                ON GPSData.GPSID = GPSTruck.TruckID
+                ON GPSData.Truck = GPSTruck.TruckID
             WHERE
                 GPSTruck.CustomerId = :customerId AND
                 TimeStamp >= :startTime AND

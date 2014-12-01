@@ -49,7 +49,7 @@ if($StartDate == '')
 if ($StartDate < date('Y-m-d'))
 {
 	$regenerate = 1;
-	$sql = "SELECT * FROM GPSTruckRoute WHERE Date = :date and GPSID = :gpsid";
+	$sql = "SELECT * FROM GPSTruckRoute WHERE Date = :date and Truck = :gpsid";
 	$params = array(':date' => $StartDate, ':gpsid' => $GPSID);
 	$stm = pdo_execute_query($sql, $params)->fetch(PDO::FETCH_OBJ);
 	$RouteRegen = str_replace("(", "new google.maps.LatLng(", $stm->Route);
@@ -324,7 +324,7 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 						Date :<input id="Day" name="Day" value="<?php echo $StartDate; ?>"><button type="button" onclick="displayDatePicker('Day', false, 'ymd', '-');"><img src="../images/SmallCalendar.gif"></button>
 						Truck : <select id="Truck" name="TruckID" class="TruckMenu">
 									<option value="-1">Select A Truck</option>
-									<option value="-2">----------</option>
+									<option value="-1">----------</option>
 									<?php echo implode('', $TList); ?>
 								</select>
 						<input type="hidden" name="run" value="1" />

@@ -44,7 +44,7 @@ function echoStopTimer($stopTimer)
 
 // Hardcoded Data, use dropdowns in implementation to get actual truck # and GPS ID
 // Upon Select Date, pick start and end times for the route, 24 hour period by default
-$GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : -1;
+$GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : 74731;
 if ($GPSID != -1)
 {
 	$TruckDriver = GPSMaps::GetTruckDriver($GPSID);
@@ -53,8 +53,8 @@ else
 {
 	$TruckDriver = -1;
 }
-$StartDate 		= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
-$FinishDate 	= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+$StartDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+$FinishDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
 if ($StartDate == '')
 {
 	$StartDate  = $_POST['Day'];
@@ -64,8 +64,7 @@ if ($StartDate == '')
 $data = getMetrics($StartDate, $FinishDate, $_SESSION['customerId'], true, true);
 
 
-$yes = 'yes';
-$TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], $yes);
+$TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], 'yes');
 $TList = array();
 while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 {
@@ -186,3 +185,4 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 		<iframe src="../keep_alive.php" width="0px" height="0px" frameborder="0" style="visibility:hidden"></iframe>
 	</body>
 </html>
+

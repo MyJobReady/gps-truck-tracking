@@ -145,7 +145,7 @@
 					FROM
 					    GPSData
 					WHERE
-					    GPSID = :id
+					    Truck = :id
 					        AND TimeStamp BETWEEN '$StartDate 00:00:00' AND '$FinishDate 23:59:59'
 					GROUP BY TimeStamp
 					LIMIT 1440";
