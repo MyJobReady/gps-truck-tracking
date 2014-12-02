@@ -4,6 +4,7 @@ require("aware_report.php");
 	require_once('../lib/GPS.php');
 	mysql_select_db($db_name, $oConn);
 
+// 2014-12-02 Updated ^CS
 // 2014-09-24 Created ^CS
 
 function echoStopTimer($stopTimer)
@@ -44,7 +45,7 @@ function echoStopTimer($stopTimer)
 
 // Hardcoded Data, use dropdowns in implementation to get actual truck # and GPS ID
 // Upon Select Date, pick start and end times for the route, 24 hour period by default
-$GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : 74731;
+$GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : -1;
 if ($GPSID != -1)
 {
 	$TruckDriver = GPSMaps::GetTruckDriver($GPSID);
@@ -53,7 +54,7 @@ else
 {
 	$TruckDriver = -1;
 }
-$StartDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+$StartDate 	= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
 $FinishDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
 if ($StartDate == '')
 {
@@ -62,7 +63,6 @@ if ($StartDate == '')
 }
 
 $data = getMetrics($StartDate, $FinishDate, $_SESSION['customerId'], true, true);
-
 
 $TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], 'yes');
 $TList = array();
@@ -132,7 +132,6 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 								Truck : <select id="Truck" name="TruckID" class="TruckMenu">
 											<option value="-1">Select A Truck</option>
 											<option value="-2">----------</option>
-											<option value="ALL">All Trucks</option>
 											<?php echo implode('', $TList); ?>
 										</select>
 								<input type="hidden" name="run" value="1" />
@@ -156,20 +155,22 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 										$idleTime = $metrics['idleTime'];
 										$runningTime = $metrics['runningTime'];
 										$stopTimer = $metrics['stopTimer'];
-
-										echo "<fieldset id='TruckReport'>";
-										echo "<b style='width:200px;float:left;'>Start Time : </b>" . $startTime .  "<br>";
-										echo "<b style='width:200px;float:left;'>Stop Time : </b>" . $stopTime .  "<br>";
-										echo "<b style='width:200px;float:left;'>Mileage : </b>" . round($mileage, 2) .  " miles <br>";
-										echo "<b style='width:200px;float:left;'>Running Time : </b>" . gmdate("H:i:s", $runningTime) .  "<br>";
-										echo "</fieldset>";
-										echo "<div style='clear: both;'>&nbsp;</div>";
-										echo "<fieldset id='TruckReport'>";
-										echo "<legend>Stop Times</legend>";
-										echo "<table width='100%'><tr><th>Start Time</th><th>End Time</th><th>Stop Duration</th><th>Location</th></tr>";
-										echoStopTimer($stopTimer);
-										echo "</table>";
-										echo "</fieldset>";
+										if ($GPSID == $truckId)
+										{
+											echo "<fieldset id='TruckReport'>";
+											echo "<b style='width:200px;float:left;'>Start Time : </b>" . $startTime .  "<br>";
+											echo "<b style='width:200px;float:left;'>Stop Time : </b>" . $stopTime .  "<br>";
+											echo "<b style='width:200px;float:left;'>Mileage : </b>" . round($mileage, 2) .  " miles <br>";
+											echo "<b style='width:200px;float:left;'>Running Time : </b>" . gmdate("H:i:s", $runningTime) .  "<br>";
+											echo "</fieldset>";
+											echo "<div style='clear: both;'>&nbsp;</div>";
+											echo "<fieldset id='TruckReport'>";
+											echo "<legend>Stop Times</legend>";
+											echo "<table width='100%'><tr><th>Start Time</th><th>End Time</th><th>Stop Duration</th><th>Location</th></tr>";
+											echoStopTimer($stopTimer);
+											echo "</table>";
+											echo "</fieldset>";
+										}
 									}
 								}
 							?>
@@ -185,4 +186,3 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 		<iframe src="../keep_alive.php" width="0px" height="0px" frameborder="0" style="visibility:hidden"></iframe>
 	</body>
 </html>
-

@@ -61,8 +61,8 @@ else
 {
 	$TruckDriver = -1;
 }
-$StartDate 		= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
-$FinishDate 	= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+$StartDate 	= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+$FinishDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
 if ($StartDate == '')
 {
 	$StartDate  = $_POST['Day'];
@@ -71,8 +71,7 @@ if ($StartDate == '')
 
 $data = getMetrics($StartDate, $FinishDate, $_SESSION['customerId'], true, true);
 
-$yes = 'yes';
-$TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], $yes);
+$TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], 'yes');
 $TList = array();
 while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 {
@@ -84,7 +83,7 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 	{
 		$selected = "";
 	}
-	$TList[] = "<option value='$TL->TruckPart' $selected >$TL->TruckName ($TL->TruckSerial)</option>";
+	$TList[] = "<option value='$TL->TruckID' $selected >$TL->TruckName ($TL->TruckSerial)</option>";
 }
 
 ?>
@@ -140,7 +139,6 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 								Truck : <select id="Truck" name="TruckID" class="TruckMenu">
 											<option value="-1">Select A Truck</option>
 											<option value="-2">----------</option>
-											<option value="ALL">All Trucks</option>
 											<?php echo implode('', $TList); ?>
 										</select>
 								<input type="hidden" name="run" value="1" />
@@ -164,19 +162,21 @@ while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 										$idleTime = $metrics['idleTime'];
 										$runningTime = $metrics['runningTime'];
 										$stopTimer = $metrics['stopTimer'];
-
-										echo "<fieldset id='TruckReport'>";
-										echo "<b style='width:200px;float:left;'>Start Time : </b>" . $startTime .  "<br>";
-										echo "<b style='width:200px;float:left;'>Stop Time : </b>" . $stopTime .  "<br>";
-										echo "<b style='width:200px;float:left;'>Mileage : </b>" . round($mileage, 2) .  " miles <br>";
-										echo "</fieldset>";
-										echo "<div style='clear: both;'>&nbsp;</div>";
-										echo "<fieldset id='TruckReport'>";
-										echo "<legend>Stop Times</legend>";
-										echo "<table width='100%'><tr><th>Start Time</th><th>End Time</th><th>Idle Duration</th><th>Location</th></tr>";
-										echoStopTimer($stopTimer);
-										echo "</table>";
-										echo "</fieldset>";
+										if ($GPSID == $truckId)
+										{
+											echo "<fieldset id='TruckReport'>";
+											echo "<b style='width:200px;float:left;'>Start Time : </b>" . $startTime .  "<br>";
+											echo "<b style='width:200px;float:left;'>Stop Time : </b>" . $stopTime .  "<br>";
+											echo "<b style='width:200px;float:left;'>Mileage : </b>" . round($mileage, 2) .  " miles <br>";
+											echo "</fieldset>";
+											echo "<div style='clear: both;'>&nbsp;</div>";
+											echo "<fieldset id='TruckReport'>";
+											echo "<legend>Stop Times</legend>";
+											echo "<table width='100%'><tr><th>Start Time</th><th>End Time</th><th>Idle Duration</th><th>Location</th></tr>";
+											echoStopTimer($stopTimer);
+											echo "</table>";
+											echo "</fieldset>";
+										}
 									}
 								}
 							?>
