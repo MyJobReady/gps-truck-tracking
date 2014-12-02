@@ -4,6 +4,7 @@ require("aware_report.php");
 	require_once('../lib/GPS.php');
 	mysql_select_db($db_name, $oConn);
 
+// 2014-12-02 Updated ^CS
 // 2014-09-24 Created ^CS
 
 function echoStopTimer($stopTimer)

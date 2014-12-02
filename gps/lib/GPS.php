@@ -177,7 +177,7 @@
 
     	public static function GetAverageSpeed($truckid)
     	{
-    		$sql = "SELECT Speed FROM GPSDataTruck WHERE GPSID = :truckid AND DATE(TimeStamp) = CURDATE() AND Speed > 0";
+    		$sql = "SELECT Speed FROM GPSDataTruck WHERE Truck = :truckid AND DATE(TimeStamp) = CURDATE() AND Speed > 0";
     		$params = array(':truckid' => $truckid);
     		$stm = pdo_execute_query($sql, $params);
     		if ($stm)

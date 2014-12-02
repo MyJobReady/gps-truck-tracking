@@ -76,15 +76,18 @@ $TruckCount = $stm->RowCount();
 									foreach ($data as $entry)
 									{
 										$count = count($entry['data']);
+										$mileage_array = array();
 										for ($i = 0; $i < $count; $i++)
 										{
 											$metrics = $entry['data'][$i];
 											$truckId = $metrics['truckId'];
 											$mileage = $metrics['mileage'];
+											$mileage_array[] = $mileage;
 										}
 									}
 
 									$x = 0;
+									$y = 0;
 									$i = 1;
 									echo "<tr>";
 									while ($t = $stm->fetch(PDO::FETCH_OBJ))
@@ -95,7 +98,7 @@ $TruckCount = $stm->RowCount();
 											echo "<fieldset class='gps' id='newreporting' style='width:auto;'>";
 											echo "<legend>$t->TruckName (<span class='FakeLink' value='$i'>hide</span>)</legend>";
 											echo "Current Driver: $t->FirstName $t->LastName<br />";
-											echo "Mileage: " . round($mileage, 2) . " Miles<br />";
+											echo "Mileage: " . round($mileage_array[$y], 2) . " Miles<br />";
 											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckPart) . " MPH <br />";
 											echo "Grade: TBD<br />";
 											echo "</fieldset>";
@@ -112,7 +115,7 @@ $TruckCount = $stm->RowCount();
 											echo "<fieldset class='gps' id='newreporting' style='width:auto;'>";
 											echo "<legend>$t->TruckName (<span class='FakeLink' value='$i'>hide</span>)</legend>";
 											echo "Current Driver: $t->FirstName $t->LastName<br />";
-											echo "Mileage: " . round($mileage, 2) . " Miles<br />";
+											echo "Mileage: " . round($mileage_array[$y], 2) . " Miles<br />";
 											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckPart) . " MPH <br />";
 											echo "Grade: TBD<br />";
 											echo "</fieldset>";
@@ -120,6 +123,7 @@ $TruckCount = $stm->RowCount();
 											$x++;
 											$i++;
 										}
+										$y++;
 									}
 								?>
 								</tr>
@@ -133,15 +137,15 @@ $TruckCount = $stm->RowCount();
 					<div style="clear: both;">&nbsp;</div>
 				</div> <!-- end container -->
 		<iframe src="../keep_alive.php" width="0px" height="0px" frameborder="0" style="visibility:hidden"></iframe>
-	<script type='text/javascript'>
-		$(".FakeLink").click(function(){
-			// show all this attr val is show_all
-			var hide = $(this).attr('value');
-			$("#truck" + hide).hide();
-			if (hide == "show_all") {
-				$("[id^='truck']").show();
-			}
-		});
-	</script>
+		<script type='text/javascript'>
+			$(".FakeLink").click(function(){
+				// show all this attr val is show_all
+				var hide = $(this).attr('value');
+				$("#truck" + hide).hide();
+				if (hide == "show_all") {
+					$("[id^='truck']").show();
+				}
+			});
+		</script>
 	</body>
 </html>

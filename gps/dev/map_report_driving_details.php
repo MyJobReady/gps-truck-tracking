@@ -4,7 +4,9 @@ require("aware_report.php");
 	require_once('../lib/GPS.php');
 	mysql_select_db($db_name, $oConn);
 
-// 2014-10-03 TEST FILE
+// 2014-12-02 Updated ^CS
+// 2014-10-03 TEST FILE ^CS
+
 // Hardcoded Data, use dropdowns in implementation to get actual truck # and GPS ID
 // Upon Select Date, pick start and end times for the route, 24 hour period by default
 $GPSID = isset($_REQUEST['TruckID']) ? $_REQUEST['TruckID'] : -1;
@@ -16,8 +18,8 @@ else
 {
 	$TruckDriver = -1;
 }
-$StartDate 		= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
-$FinishDate 	= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+$StartDate 	= isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
+$FinishDate = isset($_REQUEST['Day']) ? $_REQUEST['Day'] : date('Y-m-d');
 if ($StartDate == '')
 {
 	$StartDate  = $_POST['Day'];
@@ -31,8 +33,7 @@ $CurrentLat = $CurrentLng = $PrevLat = $PrevLng = $CurrentTimeStamp = $PrevTimeS
 $coords = GPSMaps::GetData($GPSID, $StartDate, $FinishDate);
 $coordtotal = $coords->RowCount();
 
-$yes = 'yes';
-$TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], $yes);
+$TruckList = GPSMaps::GetTruckDropDown($_SESSION['customerId'], 'yes');
 $TList = array();
 while ($TL = $TruckList->fetch(PDO::FETCH_OBJ))
 {
@@ -171,3 +172,7 @@ $Grade = 100;
 		<iframe src="../keep_alive.php" width="0px" height="0px" frameborder="0" style="visibility:hidden"></iframe>
 	</body>
 </html>
+
+<?php
+
+?>

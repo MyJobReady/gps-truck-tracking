@@ -23,7 +23,7 @@ while ($trucks = $stm->fetch(PDO::FETCH_OBJ))
 		FROM
 		    GPSData
 		WHERE
-		    GPSID = :id
+		    Truck = :id
 		    AND TimeStamp BETWEEN '$date 00:00:00' AND '$date 23:59:59'
 		GROUP BY TimeStamp
 		LIMIT 1440";
