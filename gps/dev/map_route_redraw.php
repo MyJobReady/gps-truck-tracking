@@ -2,7 +2,7 @@
 require("inc_header_ps.php");
 	require_once('../lib/GPS.php');
 	mysql_select_db($db_name, $oConn);
-
+ini_set('display_errors', 1);
 // 2014-09-19 Need to Remove Hard Coded Vars and Icon Size Fix ^CS
 // 2014-09-12 Created ^CS
 
@@ -49,7 +49,7 @@ if($StartDate == '')
 if ($StartDate < date('Y-m-d'))
 {
 	$regenerate = 1;
-	$sql = "SELECT * FROM GPSTruckRoute WHERE Date = :date and Truck = :gpsid";
+	$sql = "SELECT * FROM GPSTruckRoute WHERE Date = :date and GPSID = :gpsid";
 	$params = array(':date' => $StartDate, ':gpsid' => $GPSID);
 	$stm = pdo_execute_query($sql, $params)->fetch(PDO::FETCH_OBJ);
 	$RouteRegen = str_replace("(", "new google.maps.LatLng(", $stm->Route);

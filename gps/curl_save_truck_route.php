@@ -4,6 +4,7 @@ require ('_private/ps_log.php');
 	require_once("lib/GPS.php");
 	mysql_select_db($db_name, $oConn);
 
+ps_log_root("[SYSTEM-MSG] Save Truck Route - Begin.");
 $time_start = microtime(true);
 $rustart = getrusage();
 

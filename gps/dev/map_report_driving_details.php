@@ -92,7 +92,6 @@ $Grade = 100;
 								Truck : <select id="Truck" name="TruckID" class="TruckMenu">
 											<option value="-1">Select A Truck</option>
 											<option value="-2">----------</option>
-											<option value="ALL">All Trucks</option>
 											<?php echo implode('', $TList); ?>
 										</select>
 								<input type="hidden" name="run" value="1" />
@@ -120,12 +119,12 @@ $Grade = 100;
 									$PosDiff = GPSMaps::VGCD($CurrentLat, $CurrentLng, $PrevLat, $PrevLng);
 									if ($TimeDiff == 0 || $PosDiff == 0)
 									{
-
+										// Do Nothing
 									}
 									else
 									{
 										$MilesPerHour = round((($PosDiff/$TimeDiff) * 2.2369362920544), 2);
-										if ($MilesPerHour > 10)
+										if ($MilesPerHour > 10 && $MilesPerHour < 150)
 										{
 											$Speed[] = $MilesPerHour;
 
@@ -172,7 +171,3 @@ $Grade = 100;
 		<iframe src="../keep_alive.php" width="0px" height="0px" frameborder="0" style="visibility:hidden"></iframe>
 	</body>
 </html>
-
-<?php
-
-?>
