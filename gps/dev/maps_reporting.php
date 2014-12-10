@@ -82,13 +82,14 @@ $TruckCount = $stm->RowCount();
 											$metrics = $entry['data'][$i];
 											$truckId = $metrics['truckId'];
 											$mileage = $metrics['mileage'];
-											$mileage_array[] = $mileage;
+											$mileage_array[$truckId] = array('truckId' => $truckId, 'mileage' =>$mileage);
 										}
 									}
 
 									$x = 0;
 									$y = 0;
 									$i = 1;
+
 									echo "<tr>";
 									while ($t = $stm->fetch(PDO::FETCH_OBJ))
 									{
@@ -98,9 +99,8 @@ $TruckCount = $stm->RowCount();
 											echo "<fieldset class='gps' id='newreporting' style='width:auto;'>";
 											echo "<legend>$t->TruckName (<span class='FakeLink' value='$i'>hide</span>)</legend>";
 											echo "Current Driver: $t->FirstName $t->LastName<br />";
-											echo "Mileage: " . round($mileage_array[$y], 2) . " Miles<br />";
-											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckPart) . " MPH <br />";
-											echo "Grade: TBD<br />";
+											echo "Daily Mileage: " . round($mileage_array[$t->TruckID]['mileage'], 2) . " Miles<br />";
+											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckID) . " MPH <br />";
 											echo "</fieldset>";
 											echo "</td>";
 											$x++;
@@ -115,9 +115,8 @@ $TruckCount = $stm->RowCount();
 											echo "<fieldset class='gps' id='newreporting' style='width:auto;'>";
 											echo "<legend>$t->TruckName (<span class='FakeLink' value='$i'>hide</span>)</legend>";
 											echo "Current Driver: $t->FirstName $t->LastName<br />";
-											echo "Mileage: " . round($mileage_array[$y], 2) . " Miles<br />";
-											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckPart) . " MPH <br />";
-											echo "Grade: TBD<br />";
+											echo "Daily Mileage: " . round($mileage_array[$y], 2) . " Miles<br />";
+											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckID) . " MPH <br />";
 											echo "</fieldset>";
 											echo "</td>";
 											$x++;
