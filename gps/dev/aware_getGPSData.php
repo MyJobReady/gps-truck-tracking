@@ -24,7 +24,7 @@
                 GPSTruck.CustomerId = :customerId AND
                 TimeStamp >= :startTime AND
                 TimeStamp <= :endTime AND
-		GPSData.GPSID > 0
+				GPSData.GPSID > 0
             ORDER BY
                 GPSData.Truck, GPSData.TimeStamp;
         ";

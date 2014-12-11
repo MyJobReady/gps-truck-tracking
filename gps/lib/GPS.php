@@ -146,6 +146,7 @@
 					    GPSData
 					WHERE
 					    Truck = :id
+					    	AND GPSData.GPSID > 0
 					        AND TimeStamp BETWEEN '$StartDate 00:00:00' AND '$FinishDate 23:59:59'
 					GROUP BY TimeStamp
 					LIMIT 1440";

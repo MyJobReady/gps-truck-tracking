@@ -115,7 +115,7 @@ $TruckCount = $stm->RowCount();
 											echo "<fieldset class='gps' id='newreporting' style='width:auto;'>";
 											echo "<legend>$t->TruckName (<span class='FakeLink' value='$i'>hide</span>)</legend>";
 											echo "Current Driver: $t->FirstName $t->LastName<br />";
-											echo "Daily Mileage: " . round($mileage_array[$y], 2) . " Miles<br />";
+											echo "Daily Mileage: " . round($mileage_array[$t->TruckID]['mileage'], 2) . " Miles<br />";
 											echo "Avg Speed: " . GPSMaps::GetAverageSpeed($t->TruckID) . " MPH <br />";
 											echo "</fieldset>";
 											echo "</td>";

@@ -152,14 +152,17 @@ $Grade = 100;
 									$SpeedTotal += $Speed[$i];
 								}
 
-								echo "<fieldset id='TruckReport'>";
-								echo "Precision Average Truck Speed * : " . round($SpeedTotal/$coordtotal, 2) . " MPH<br />";
-								echo "Raw Truck Speed * : " . GPSMaps::GetAverageSpeed($GPSID) . " MPH <br />";
-								echo "Number of Speeding Alerts : $SpeedAlert <br />";
-								echo "Top Daily Speeds : <br />$Speed[0] MPH <br />$Speed[1] MPH <br />$Speed[2] MPH <br />$Speed[3] MPH <br />$Speed[4] MPH <br />";
-								echo "<br />Hard Braking // Fast Accel<br /><br />";
-								echo "Driving Grade : ". round($Grade - ($SpeedAlert*2),2) ."<br />";
-								echo "</fieldset>";
+								if ($GPSID != -1)
+								{
+									echo "<fieldset id='TruckReport'>";
+									echo "Average Truck Speed : " . round($SpeedTotal/$coordtotal, 2) . " MPH |&nbsp;";
+									echo "Raw Truck Speed * : " . GPSMaps::GetAverageSpeed($GPSID) . " MPH <br /><br />";
+									echo "Number of Speeding Alerts : $SpeedAlert <br /><br />";
+									echo "Top Daily Speeds : <br />$Speed[0] MPH <br />$Speed[1] MPH <br />$Speed[2] MPH <br />$Speed[3] MPH <br />$Speed[4] MPH <br />";
+									echo "Driving Grade : ". round($Grade - ($SpeedAlert*2),2) ."<br />";
+									echo "</fieldset>";
+								}
+
 							?>
 
 							<div style="clear: both;">&nbsp;</div>
