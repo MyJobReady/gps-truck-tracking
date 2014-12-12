@@ -27,6 +27,8 @@ if ($StartDate == '')
 }
 
 $Speed = array();
+$Braking = array();
+$Accel = array();
 $SpeedAlert = 0;
 $CurrentLat = $CurrentLng = $PrevLat = $PrevLng = $CurrentTimeStamp = $PrevTimeStamp = "";
 
@@ -124,11 +126,11 @@ $Grade = 100;
 									else
 									{
 										$MilesPerHour = round((($PosDiff/$TimeDiff) * 2.2369362920544), 2);
-										if ($MilesPerHour > 10 && $MilesPerHour < 150)
+										if ($MilesPerHour > 10 && $MilesPerHour < 100)
 										{
 											$Speed[] = $MilesPerHour;
 
-											if ($MilesPerHour > 70)
+											if ($MilesPerHour > 75)
 											{
 												$SpeedAlert++;
 											}
@@ -137,6 +139,15 @@ $Grade = 100;
 										{
 											$coordtotal--;
 										}
+
+										if ($PrevMPH <> '')
+										{
+											if (abs($PrevMPH - $MilesPerHour) > 30)
+											{
+												$HarshBrakingFastAccel++;
+											}
+										}
+										$PrevMPH = $MilesPerHour;
 									}
 
 									// Set Current to Previous for Next Calculation
@@ -157,9 +168,20 @@ $Grade = 100;
 									echo "<fieldset id='TruckReport'>";
 									echo "Average Truck Speed : " . round($SpeedTotal/$coordtotal, 2) . " MPH |&nbsp;";
 									echo "Raw Truck Speed * : " . GPSMaps::GetAverageSpeed($GPSID) . " MPH <br /><br />";
-									echo "Number of Speeding Alerts : $SpeedAlert <br /><br />";
-									echo "Top Daily Speeds : <br />$Speed[0] MPH <br />$Speed[1] MPH <br />$Speed[2] MPH <br />$Speed[3] MPH <br />$Speed[4] MPH <br />";
-									echo "Driving Grade : ". round($Grade - ($SpeedAlert*2),2) ."<br />";
+									echo "Number of Fast Accel/Harsh Braking Alerts : $HarshBrakingFastAccel<br />";
+									echo "Number of Driving Alerts : $SpeedAlert <br /><br />";
+									echo "Top Daily Speeds : <br />$Speed[0] MPH <br />$Speed[1] MPH <br />$Speed[2] MPH <br />$Speed[3] MPH <br />$Speed[4] MPH <br /><br />";
+									echo "Driving Grade : ". round($Grade - (($SpeedAlert*1) + ($HarshBrakingFastAccel*2)),2) ."<br />";
+									echo "</fieldset>";
+
+									echo '<div style="clear: both;">&nbsp;</div>';
+
+									echo "<fieldset id='TruckReport'>";
+									echo "<legend>Definitions</legend>";
+									echo "Raw Truck Speed - Recorded Speed in MPH by the trucks onboard device.<br />";
+									echo "Average Truck Speed - Calibrated Speed in MPH from the LAT and LNG of all recorded positions of the truck.<br />";
+									echo "Fast Acceleration / Harsh Braking - Noted when the truck increases or decreases by 30 MPH between Raw Truck Speed recordings.<br />";
+									echo "Driving Alerts - Noted when the truck increases over the speed of 75 MPH.<br />";
 									echo "</fieldset>";
 								}
 
